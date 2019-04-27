@@ -1,0 +1,15 @@
+Assembly-CSharp.csproj
+Assembly-CSharp-Editor.csproj
+etc/
+Ludum Dare 44.sln
+Done.userprefs
+Library/
+obj/
+Temp/
+UnityPackageManager/
+Builds/
+*.exe
+block_Data/
+ProjectSettings/
+UnityPlayer.dll
+Assembly-Csharp-firstpass.csproj
