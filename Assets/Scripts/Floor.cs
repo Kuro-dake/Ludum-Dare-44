@@ -9,7 +9,11 @@ public class Floor : MonoBehaviour {
 	Color tile_color;
 	[SerializeField]
 	FloorTile[,] tiles;
+	[SerializeField]
+	Material light_material;
+	public int grid_size;
 	public void GenerateGrid(int size){
+		grid_size = size;
 		tiles = new FloorTile[size, size];
 		transform.DestroyChildren ();
 		float tile_width = Setup.base_settings.GetFloat ("tile_width");
@@ -22,9 +26,13 @@ public class Floor : MonoBehaviour {
 				tile.sr ().sprite = sprites[Random.Range (0, sprites.Length)];
 				tile.transform.position = new Vector2 (offset_x + x * tile_width, offset_y + y * tile_height);
 				tile.transform.SetParent (transform);
-				tile.sr ().sortingOrder = y * -1;
+				tile.sr ().sortingOrder = y * -1 + x;
 				tile.sr ().color = tile_color * Random.Range (.9f, 1.1f);
-				tiles [x, y] = tile.GetComponent<FloorTile>();
+				tile.sr ().sortingLayerName = "Ground";
+				FloorTile ft = tile.GetComponent<FloorTile> ();
+				ft.Init (x, y);
+				//tile.sr ().material = light_material;
+				tiles [x, y] = ft;
 			}
 		}
 	}
@@ -41,4 +49,34 @@ public class Floor : MonoBehaviour {
 			return tiles [x, y];
 		}
 	}
+
+	public FloorTile this[GridPosition gp]{
+		get{
+			return this [gp.x, gp.y];
+		}
+	}
+
+	public List<GridPosition> GetUnoccupiedFieldPositions(){
+		List<GridPosition> positions = new List<GridPosition> ();
+		for (int x = 0; x < grid_size; x++) {
+			for (int y = 0; y < grid_size; y++) {
+				if (GM.characters [x, y] == null) {
+					positions.Add (new GridPosition( x, y ));
+				}
+			}
+		}
+		return positions;
+	}
+
+	public bool[,] GetPassabilityMap(List<GridPosition> free = null){
+		bool[,] ret = new bool[grid_size, grid_size];
+		for (int x = 0; x < grid_size; x++) {
+			for (int y = 0; y < grid_size; y++) {
+				ret [x, y] = GM.characters [x, y] == null;
+			}
+		}
+		return ret;
+	}
+
+
 }

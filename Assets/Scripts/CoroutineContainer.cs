@@ -41,4 +41,10 @@ public class CoroutineContainer : MonoBehaviour {
 		devrefreshpublic ();
 	}
 
+	public bool any_routines_running{
+		get{
+			return routines.Count > 0;
+		}
+	}
+
 }

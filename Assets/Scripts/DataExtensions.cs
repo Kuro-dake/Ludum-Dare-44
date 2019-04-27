@@ -250,7 +250,18 @@ public static class DataExtensions {
 			return find_list.Contains(obj);
 		});
 	}
-
+	private static System.Random rng = new System.Random();  
+	public static void Shuffle<T>(this IList<T> list)  
+	{  
+		int n = list.Count;  
+		while (n > 1) {  
+			n--;  
+			int k = rng.Next(n + 1);  
+			T value = list[k];  
+			list[k] = list[n];  
+			list[n] = value;  
+		}  
+	}
 
 
 }
@@ -324,4 +335,73 @@ public class FloatRange : Pair<float, float>{
 	{
 		return string.Format ("[FloatRange: min={0}, max={1}, steps={2}]", min, max, steps);
 	}
+}
+
+public class GridPosition{
+	public int x,y;
+	public GridPosition(int xpos, int ypos){
+		x = xpos;y = ypos;
+	}
+	public override string ToString ()
+	{
+		return string.Format ("[GridPosition]" + x + ":" + y);
+	}
+	public FloorTile ft {
+		get {
+			return GM.floor [x, y];
+		}
+	}
+
+	public override bool Equals (object obj)
+	{
+		if (!(obj is GridPosition)) {
+			return false;
+		}
+		GridPosition other = obj as GridPosition;
+		return other.x == x && other.y == y;
+	}
+
+	public GridPosition[] all_directions {
+		get {
+
+			return new GridPosition[]{
+				n (x, y + 1), n (x, y - 1), n (x + 1, y), n (x - 1, y), 
+				n (x + 1, y + 1), n (x - 1, y + 1), n (x + 1, y - 1), n (x - 1, y - 1)
+
+			};
+		}
+
+	}
+	private GridPosition n(int nx, int ny){
+		return new GridPosition (nx, ny);
+	}
+
+	public int abs_sum{
+		get{
+			return Mathf.Abs(x) + Mathf.Abs(y);
+		}
+	}
+
+	public static GridPosition operator +(GridPosition a, GridPosition b){
+		GridPosition ret = a.clone;
+		ret.x += b.x;
+		ret.y += b.y;
+		return ret;
+
+	}
+
+	public static GridPosition operator -(GridPosition a, GridPosition b){
+		GridPosition ret = a.clone;
+		ret.x -= b.x;
+		ret.y -= b.y;
+		return ret;
+
+	}
+
+	public GridPosition clone{
+		get {
+			return new GridPosition(x,y);
+		}
+	}
+
 }

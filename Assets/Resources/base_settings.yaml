@@ -2,3 +2,8 @@ grid_size: 5
 tile_width: 2.1
 tile_height: 2.2
 movement_speed: 12
+dying_fade_speed: 2
+shake_screen_duration: .1
+shake_screen_force: .2
+attack_speed: 25
+attack_distance: .5

@@ -4,20 +4,23 @@ using UnityEngine;
 
 public class Player : Character {
 
-	public override void MoveTo (int x, int y)
+	protected override HPBar hpbar {get {return GM.player_HPBar;}}
+
+	public override void MoveTo (int x, int y, bool instant = false)
 	{
-		base.MoveTo (x, y);
+		base.MoveTo (x, y, instant);
 	}
 
-	// Use this for initialization
-	void Start () {
-		
+	public override void Initialize ()
+	{
+		player_faction = true;
+		base.Initialize ();
+		hp = 3;
 	}
 
-
-
-	// Update is called once per frame
-	void Update () {
-		
+	public override void ReceiveDamage (int damage)
+	{
+		base.ReceiveDamage (damage);
+		Debug.Log ("player hit");
 	}
 }

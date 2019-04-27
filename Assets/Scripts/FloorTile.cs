@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class FloorTile : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
+	public GridPosition gp{ get;protected set; }
+
+	public void Init(int x, int y){
+		gp = new GridPosition (x, y);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+	public Character occupant{get {return GM.characters [gp.x, gp.y];}}
 }
