@@ -10,7 +10,6 @@ UnityPackageManager/
 Builds/
 *.exe
 block_Data/
-ProjectSettings/
 UnityPlayer.dll
 Assembly-Csharp-firstpass.csproj
 *.meta
