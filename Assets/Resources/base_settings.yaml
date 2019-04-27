@@ -7,3 +7,6 @@ shake_screen_duration: .1
 shake_screen_force: .2
 attack_speed: 25
 attack_distance: .5
+genie_tail_range: .03,.06
+genie_tail_dissipate_speed: .5
+genie_tail_scale_rate: 1.1

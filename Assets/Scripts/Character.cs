@@ -4,6 +4,16 @@ using UnityEngine;
 
 public abstract class Character : MonoBehaviour {
 	int _ap;
+	int _free_movement;
+	public virtual int free_movement{
+		get{
+			return _free_movement;
+		}
+		set {
+			_free_movement = value;
+		}
+	}
+	public int free_movement_max = 0;
 	public int ap_regen = 1;
 	public virtual int ap{
 		get{
@@ -50,12 +60,20 @@ public abstract class Character : MonoBehaviour {
 	}
 
 	public virtual void Move(int x, int y){
-		ap -= 1;
+		if (MoveTo (x_pos + x, y_pos + y) == action_result.attack) {
+			ap -= 1;
+		} else {
+			if (free_movement > 0) {
+				free_movement -= 1;
+			} else {
+				ap -= 1;
+			}
+		}
 
 		if (x != 0) {
 			Orientation (x > 0);
 		}
-		MoveTo (x_pos + x, y_pos + y);
+
 	}
 
 	protected virtual IEnumerator Attack(Character target){
@@ -73,7 +91,7 @@ public abstract class Character : MonoBehaviour {
 
 	}
 
-	public virtual void MoveTo(int x, int y, bool instant = false){ // interact with
+	public virtual action_result MoveTo(int x, int y, bool instant = false){ // interact with
 
 		x = Mathf.Clamp (x, 0, GM.floor.max_x);
 		y = Mathf.Clamp (y, 0, GM.floor.max_y);
@@ -82,7 +100,7 @@ public abstract class Character : MonoBehaviour {
 
 		if (ft.occupant != null && ft.occupant != this && ft.occupant.player_faction != player_faction) {
 			GM.routines.CStart ("char_attack_" + GetInstanceID() ,Attack (ft.occupant));
-			return;
+			return action_result.attack;
 		}
 
 		x_pos = x;
@@ -90,10 +108,11 @@ public abstract class Character : MonoBehaviour {
 
 		if (instant) {
 			transform.position = GM.floor [x_pos, y_pos].transform.position;
-			return;
+			return action_result.movement;
 		}
 		else {
 			GM.routines.CStart ("char_move_" + this.GetInstanceID (), MovementRoutine (GM.floor [x_pos, y_pos]));
+			return action_result.movement;
 		}
 
 
@@ -152,5 +171,11 @@ public abstract class Character : MonoBehaviour {
 
 	public virtual void StartTurn(){
 		ap = Mathf.Clamp(Mathf.Clamp(ap, 0, apmax) + ap_regen, 0, apmax);
+		free_movement = free_movement_max;
 	}
+}
+
+public enum action_result{
+	movement,
+	attack
 }

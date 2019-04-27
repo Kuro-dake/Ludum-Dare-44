@@ -1,5 +1,6 @@
 x: 5
-y: 6
+y: 7
+cam: 11
 enemies:
  - type: smiley
    pos: 3,3

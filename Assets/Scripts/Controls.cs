@@ -28,7 +28,7 @@ public class Controls : MonoBehaviour
 	bool HandleButtonDown (input_action mapped_action)
 	{
 
-		if (buttons_down.Contains (mapped_action) || GM.routines.any_routines_running) {
+		if (buttons_down.Contains (mapped_action) || GM.routines.any_routines_running || !GM.inst.player_turn) {
 			return false;
 		}
 

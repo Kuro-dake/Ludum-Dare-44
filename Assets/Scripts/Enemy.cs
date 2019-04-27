@@ -6,7 +6,8 @@ public class Enemy : Character {
 
 	public override void Initialize ()
 	{
-		
+		apmax = 2;
+		ap_regen = 2;
 		base.Initialize ();
 		hpbar = GameObject.Instantiate (GM.characters.monster_hpbar).GetComponent<MonsterHPBar>();
 		hpbar.Initialize (this);

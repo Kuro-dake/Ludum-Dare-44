@@ -6,6 +6,16 @@ public class Player : Character {
 
 	protected override HPBar hpbar {get {return GM.player_HPBar;}}
 
+	public override int free_movement {
+		get {
+			return base.free_movement;
+		}
+		set {
+			base.free_movement = value;
+			GM.player_FMBar.DisplayHP (value);
+		}
+	}
+
 	public override int ap {
 		get {
 			return base.ap;
@@ -24,9 +34,9 @@ public class Player : Character {
 		}
 	}
 
-	public override void MoveTo (int x, int y, bool instant = false)
+	public override action_result MoveTo (int x, int y, bool instant = false)
 	{
-		base.MoveTo (x, y, instant);
+		return base.MoveTo (x, y, instant);
 	}
 
 	public override void Initialize ()
@@ -34,6 +44,9 @@ public class Player : Character {
 		player_faction = true;
 		base.Initialize ();
 		hp = 4;
+		free_movement_max = 0;
+		ap = 1;
+		MoveTo (0, 0, true);
 	}
 
 	public override void ReceiveDamage (int damage)

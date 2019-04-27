@@ -95,10 +95,12 @@ public class CharacterManager : MonoBehaviour {
 				continue;
 			}
 			while (c.ap > 0) {
+				Debug.Log (c.ap);
 				if ((c as Enemy).Movement ()) {
 					while (GM.routines.any_routines_running) {
 						yield return null;
 					}
+					yield return new WaitForSeconds (.1f);
 				} else {
 					break;
 				}
