@@ -36,6 +36,7 @@ public class Controls : MonoBehaviour
 		if (movement.Contains (mapped_action)) {
 			
 			GM.player.Move (movement_values [mapped_action] [0], movement_values [mapped_action] [1]);
+			GM.genie.SetActive (false);
 		}
 
 		return false;

@@ -42,7 +42,7 @@ public abstract class Character : MonoBehaviour {
 	[SerializeField]
 	protected int _hp = 1;
 	public int hp{ get{ return _hp;} 
-		protected set{ 
+		set{ 
 			_hp = value;
 			hpbar.DisplayHP (_hp);
 

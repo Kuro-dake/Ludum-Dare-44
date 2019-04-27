@@ -3,14 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Shop : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
 	
-	// Update is called once per frame
-	void Update () {
-		
+	public GameObject price_heart;
+
+	public List<ShopButton> buttons = new List<ShopButton>();
+
+	public bool active{
+		get{
+			return gameObject.activeSelf;
+		}
+		set{
+			gameObject.SetActive (value);
+		}
+	}
+
+	void Start(){
+		active = false;
+	}
+
+	public void SetPrice(){
+		buttons [0].SetPrice (4);
+	}
+
+	public void Close(){
+		active = false;
 	}
 }

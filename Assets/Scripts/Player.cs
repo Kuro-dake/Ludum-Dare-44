@@ -16,6 +16,8 @@ public class Player : Character {
 		}
 	}
 
+	public int defense = 0;
+
 	public override int ap {
 		get {
 			return base.ap;
