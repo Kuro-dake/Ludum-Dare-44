@@ -31,27 +31,30 @@ public static class PathSearch {
 
 		RateBlocks (new List<GridPosition>(new GridPosition[]{from}), to, 0, free);
 
-		if (scores [to.x, to.y] == 30000) {
+		if (scores [to.x, to.y] == 500) {
 			return g_path;
 		}
 
 
 		GridPosition current_gp = to;
 		g_path.Add (current_gp);
-
-		while (current_gp != from) {
+		int iters = 30;
+		while (current_gp != from && iters > 0) {
 			int min_score = 30000;
-
+			iters--;
 			foreach(GridPosition dgp in current_gp.all_directions){
 
 				if (dgp.x >= scores.GetLength (0) || dgp.x < 0 || dgp.y >= scores.GetLength (1) || dgp.y < 0 || !map [dgp.x, dgp.y]) {
+					
 					continue;
 				}
 
 				if(min_score > scores[dgp.x, dgp.y]){
 					min_score = scores[dgp.x, dgp.y];
 					current_gp = dgp;
+
 				}
+
 
 			}
 
@@ -61,18 +64,31 @@ public static class PathSearch {
 		g_path.Remove (from);
 		g_path.Reverse ();
 
+		for (int x = 0; x < scores.GetLength (0); x += 1) {
+			for (int y = 0; y < scores.GetLength (1); y += 1) {
+				continue;
+				GameObject rating = new GameObject ();
+				rating.transform.position = GM.floor [x, y].transform.position;
+				TextMesh tm = rating.AddComponent<TextMesh> ();
+				tm.text = scores [x, y].ToString ();
+				tm.alignment = TextAlignment.Center;
+				tm.anchor = TextAnchor.MiddleCenter;
+				tm.GetComponent<Renderer> ().sortingLayerName = "UI";
+				ratings.Add (rating);
+			}
+		}
 		return g_path;
 
 
 
 	}
-
+	public static List<GameObject> ratings = new List<GameObject> ();
 	public static int iterations = 0;
 	public static int max_value = 0;
 	public static bool finish = false;
 
 	public static List<GridPosition> rated = new List<GridPosition>();
-	public static int limit_depth = -1;
+	public static int limit_depth = 50;
 	public static bool use_visibility_map = false;
 	public static bool get_all = false;
 
@@ -116,7 +132,7 @@ public static class PathSearch {
 			return new List<GridPosition>();
 		}
 		limit_depth = range;
-		use_visibility_map = true;
+		//use_visibility_map = true;
 		RateBlocks (new List<GridPosition> (new GridPosition[]{from}), null);
 		limit_depth = -1;
 		use_visibility_map = false;
@@ -127,7 +143,12 @@ public static class PathSearch {
 	public static void RateBlocks(List<GridPosition> to_rate, GridPosition target, int value = 0, List<GridPosition> free = null){
 		if (value == 0) {
 			iterations = 0;
-			scores = new int[GM.floor.grid_size,GM.floor.grid_size];
+			scores = new int[GM.floor.grid_size_x ,GM.floor.grid_size_y];
+			for (int x = 0; x < GM.floor.grid_size_x; x++) {
+				for (int y = 0; y < GM.floor.grid_size_y; y++) {
+					scores [x, y] = 500;
+				}
+			}
 
 			map = GM.floor.GetPassabilityMap(free);
 
@@ -140,7 +161,7 @@ public static class PathSearch {
 		}
 
 		if (finish || limit_depth > 0 && value > limit_depth) {
-
+			
 			return;
 		}
 
@@ -151,6 +172,7 @@ public static class PathSearch {
 				iterations++;
 
 				if(target != null && dir_gp == target){
+					
 					finish = true;
 				}
 
@@ -167,6 +189,7 @@ public static class PathSearch {
 
 				int increased_val = scores[gp.x, gp.y] + ((dir_gp - gp).abs_sum == 2 ? 14 : 10);
 				scores[dir_gp.x, dir_gp.y] = scores[dir_gp.x, dir_gp.y] > increased_val ? increased_val : scores[dir_gp.x, dir_gp.y];
+
 				if(!rated.Contains(dir_gp)){
 					rated_next.Add(dir_gp);
 					rated.Add(dir_gp);

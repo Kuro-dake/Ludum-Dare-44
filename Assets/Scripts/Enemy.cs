@@ -10,6 +10,18 @@ public class Enemy : Character {
 		base.Initialize ();
 		hpbar = GameObject.Instantiate (GM.characters.monster_hpbar).GetComponent<MonsterHPBar>();
 		hpbar.Initialize (this);
-		hp = 4;
+		hp = 3;
+	}
+
+	public bool Movement(){
+		List<GridPosition> path = PathSearch.FindDirectPath (gp, GM.player.gp, new List<GridPosition>(new GridPosition[]{gp, GM.player.gp}));
+
+		if (path.Count > 0) {
+			GridPosition target = path [0];
+			Move ((target.x - gp.x).Sign(), (target.y - gp.y).Sign());
+			return true;
+		}
+		return false;
+
 	}
 }

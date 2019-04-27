@@ -3,7 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Character : MonoBehaviour {
-
+	int _ap;
+	public int ap_regen = 1;
+	public virtual int ap{
+		get{
+			return _ap;
+		}
+		set{
+			_ap = value;
+		}
+	}
+	public int apmax = 3;
 	protected int x_pos, y_pos;
 	bool tracking = false;
 	public int x_position{get{return x_pos;}}
@@ -19,7 +29,7 @@ public abstract class Character : MonoBehaviour {
 			return hp > 0;
 		}
 	}
-
+	[SerializeField]
 	protected int _hp = 1;
 	public int hp{ get{ return _hp;} 
 		protected set{ 
@@ -40,10 +50,12 @@ public abstract class Character : MonoBehaviour {
 	}
 
 	public virtual void Move(int x, int y){
-		MoveTo (x_pos + x, y_pos + y);
+		ap -= 1;
+
 		if (x != 0) {
 			Orientation (x > 0);
 		}
+		MoveTo (x_pos + x, y_pos + y);
 	}
 
 	protected virtual IEnumerator Attack(Character target){
@@ -78,6 +90,7 @@ public abstract class Character : MonoBehaviour {
 
 		if (instant) {
 			transform.position = GM.floor [x_pos, y_pos].transform.position;
+			return;
 		}
 		else {
 			GM.routines.CStart ("char_move_" + this.GetInstanceID (), MovementRoutine (GM.floor [x_pos, y_pos]));
@@ -86,7 +99,7 @@ public abstract class Character : MonoBehaviour {
 
 	}
 
-	protected IEnumerator MovementRoutine(FloorTile tile){
+	public IEnumerator MovementRoutine(FloorTile tile){
 		Vector3 target = tile.transform.position;
 		while(Vector2.Distance(transform.position,target) > 0f){
 			transform.position = Vector2.MoveTowards(transform.position, target , Time.deltaTime * Setup.base_settings.GetFloat("movement_speed"));
@@ -106,7 +119,7 @@ public abstract class Character : MonoBehaviour {
 		//hp = Random.Range (3, 6);
 		hp -= damage;
 		if (hp <= 0) {
-			StartCoroutine (FadeDie ());
+			GM.routines.CStart("die_" + GetInstanceID(), FadeDie ());
 		}
 		GM.cam.Shake ();
 	}
@@ -135,5 +148,9 @@ public abstract class Character : MonoBehaviour {
 
 	public virtual void Initialize(){
 		MoveTo (x_pos, y_pos, true);
+	}
+
+	public virtual void StartTurn(){
+		ap = Mathf.Clamp(Mathf.Clamp(ap, 0, apmax) + ap_regen, 0, apmax);
 	}
 }

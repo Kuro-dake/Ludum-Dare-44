@@ -7,10 +7,21 @@ public class CharacterManager : MonoBehaviour {
 	List<Character> _characters = new List<Character>();
 	List<Character> characters{
 		get{
-			_characters.RemoveAll (delegate(Character obj) {
-				return obj == null || !obj.is_alive;
+			
+			return _characters.FindAll(delegate(Character obj) {
+				//Debug.Log(obj.name + " is " + (obj == null ? "" : " not ") + " null and "+ (obj.is_alive ? " is alive " : " is dead")); 
+				return obj != null && obj.is_alive;
 			});
-			return _characters;
+
+		}
+	}
+	public List<Enemy> enemies {
+		get{
+			return _characters.FindAll (delegate(Character obj) {
+				return obj is Enemy;	
+			}).ConvertAll<Enemy> (delegate(Character input) {
+				return input as Enemy;	
+			});
 		}
 	}
 	[SerializeField]
@@ -27,17 +38,15 @@ public class CharacterManager : MonoBehaviour {
 		characters.RemoveAll(delegate(Character obj) {
 			return obj is Enemy;
 		});
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 1; i++) {
 			GenerateRandomEnemy ();
 		}
 	}
 
-	public void GenerateRandomEnemy(){
-		List<GridPosition> free = GM.floor.GetUnoccupiedFieldPositions ();
-		free.Shuffle();
-		GridPosition gp = free [0];
+	public void GenerateEnemy(int x, int y){
+		
 		Enemy en = GameObject.Instantiate (enemy_types[0].gameObject).GetComponent<Enemy>();
-		en.MoveTo (gp.x, gp.y, true);
+		en.MoveTo (x, y, true);
 		en.transform.localScale *= Random.Range (.9f, 1.1f);
 		en.GetComponent<Animator> ().speed = Random.Range (.9f, 1.1f);
 		en.TrackCharacter ();
@@ -47,12 +56,21 @@ public class CharacterManager : MonoBehaviour {
 		foreach (SpriteRenderer sr in en.transform.GetComponentsInChildren<SpriteRenderer>()) {
 			sr.color = enemy_color; 
 		}
+		en.sr ().color = Color.black;
 		en.Initialize ();
 
 	}
 
+	public void GenerateRandomEnemy(){
+		List<GridPosition> free = GM.floor.GetUnoccupiedFieldPositions ();
+		free.Shuffle();
+		GridPosition gp = free [0];
+		GenerateEnemy (gp.x, gp.y);
+
+	}
+
 	public void TrackCharacter(Character ch){
-		characters.Add (ch);
+		_characters.Add (ch);
 	}
 
 	public Character this[int x, int y]{
@@ -61,6 +79,52 @@ public class CharacterManager : MonoBehaviour {
 				return obj.x_position == x && obj.y_position == y;	
 			});
 		}
+	}
+
+	IEnumerator EnemyTurnStep(){
+		ClearDead ();
+		while (GM.routines.any_routines_running) {
+			yield return null;
+		}
+		foreach(Character c in characters){
+			if(!(c is Enemy)){
+				continue;
+			}	
+
+			if (c == null) {
+				continue;
+			}
+			while (c.ap > 0) {
+				if ((c as Enemy).Movement ()) {
+					while (GM.routines.any_routines_running) {
+						yield return null;
+					}
+				} else {
+					break;
+				}
+			}
+
+
+		}
+		while (GM.routines.any_routines_running) {
+			yield return null;
+		}
+		GM.inst.StartTurn ();
+		ClearDead ();
+		if (enemies.Count == 0) {
+			GM.inst.NextLevel ();
+		}
+	}
+	protected void ClearDead(){
+		_characters.RemoveAll (delegate(Character obj) {
+			return obj == null || !obj.is_alive;
+		});
+	}
+	public void EnemyTurn(){
+		enemies.ForEach (delegate(Enemy obj) {
+			obj.StartTurn();	
+		});
+		StartCoroutine(EnemyTurnStep ());
 	}
 
 

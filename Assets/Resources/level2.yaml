@@ -1,0 +1,9 @@
+x: 5
+y: 6
+enemies:
+ - type: smiley
+   pos: 3,3
+ - type: smiley
+   pos: 3,5
+ - type: smiley
+   pos: 4,4

@@ -38,6 +38,7 @@ public class Setup{
 		return named_setup [name];
 	}
 	public static Setup base_settings{ get { return GetSetup ("base_settings"); } }
+	public static Setup levels{ get { return GetSetup ("levels"); } }
 
 	string file;
 	public Setup(string filename){
@@ -50,7 +51,7 @@ public class Setup{
 
 	Dictionary <string, YamlNode> buffer = new Dictionary<string, YamlNode> ();
 
-	T GetChainedNode<T>(string s) where T : YamlNode{
+	public T GetChainedNode<T>(string s) where T : YamlNode{
 		s = s.Replace (":", ";");
 		if (!buffer.ContainsKey (s)) {
 			string[] steps = s.Split (new char[]{ ';' });
@@ -121,9 +122,9 @@ public static class DataExtensions {
 			return float.Parse(input);
 		}).ToArray();
 	}
-	public static float[] GetIntArray(this YamlMappingNode n, string what) {
-		return new List<string>(n.Get (what).Split(new char[]{','})).ConvertAll<float>(delegate(string input) {
-			return float.Parse(input);
+	public static int[] GetIntArray(this YamlMappingNode n, string what) {
+		return new List<string>(n.Get (what).Split(new char[]{','})).ConvertAll<int>(delegate(string input) {
+			return int.Parse(input);
 		}).ToArray();
 	}
 	public static YamlNode GetNode(this YamlMappingNode n, string what){
@@ -169,6 +170,9 @@ public static class DataExtensions {
 	}
 	public static void h(this GameObject g, float h){
 		g.transform.localScale = new Vector3(g.transform.localScale.x, h);
+	}
+	public static int Sign(this int f){
+		return f == 0 ? 0 : (f > 0 ? 1 : -1);
 	}
 	public static float Sign(this float f){
 		return f == 0f ? 0f : Mathf.Sign (f);
@@ -366,7 +370,7 @@ public class GridPosition{
 
 			return new GridPosition[]{
 				n (x, y + 1), n (x, y - 1), n (x + 1, y), n (x - 1, y), 
-				n (x + 1, y + 1), n (x - 1, y + 1), n (x + 1, y - 1), n (x - 1, y - 1)
+				//n (x + 1, y + 1), n (x - 1, y + 1), n (x + 1, y - 1), n (x - 1, y - 1)
 
 			};
 		}
@@ -403,5 +407,24 @@ public class GridPosition{
 			return new GridPosition(x,y);
 		}
 	}
+
+	public static bool operator ==(GridPosition a, GridPosition b)
+	{
+		if (System.Object.ReferenceEquals(a, b))
+		{
+			return true;
+		}
+		if (((object)a == null) || ((object)a == null)) {
+			return false;
+		}
+		return a.Equals (b);
+	}
+
+	public static bool operator !=(GridPosition a, GridPosition b)
+	{
+		return !(a == b);
+	}
+
+
 
 }
