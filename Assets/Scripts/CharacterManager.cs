@@ -121,7 +121,7 @@ public class CharacterManager : MonoBehaviour {
 					while (GM.routines.any_routines_running) {
 						yield return null;
 					}
-					yield return new WaitForSeconds (.1f);
+					//yield return new WaitForSeconds (.1f);
 				} else {
 					break;
 				}

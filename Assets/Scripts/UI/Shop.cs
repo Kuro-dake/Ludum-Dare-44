@@ -28,6 +28,8 @@ public class Shop : MonoBehaviour {
 
 	public void Close(){
 		active = false;
+		GM.routines.Stop ("genie_speech");
+		GM.genie.SetBubbleText("Make me proud peasant.", false);
 	}
 
 	public void SetButtons(int[] btns, int[] prices, int[] values){
@@ -49,5 +51,13 @@ public class Shop : MonoBehaviour {
 			obj.mod.active = false;
 			obj.ShowToggled();
 		});
+	}
+
+	public bool has_any_wares {
+		get{
+			return null != buttons.Find (delegate(ShopButton obj) {
+				return obj.GetComponent<Button>().interactable;	
+			});
+		}
 	}
 }

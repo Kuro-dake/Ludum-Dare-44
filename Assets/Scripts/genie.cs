@@ -12,14 +12,22 @@ public class Genie : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		tail_delay = new FloatRange(Setup.base_settings.AGetFloat("genie_tail_range"));
+		bubble_text = "";
 	}
 	
 	// Update is called once per frame
 	float taildelay = 0f;
+	float sound_delay = 0f;
+	FloatRange pitch_range;
 	void Update () {
 		if (!active_tail) {
+			GM.music.running = GM.player.is_alive ? 3 : 2;
+			bubble_text = "";
 			return;
 		}
+
+		GM.music.running = 2;
+		pitch_range = new FloatRange (.5f, 1f);
 		tail_fragments.RemoveAll (delegate(GameObject obj) {
 			return obj == null;	
 		});
@@ -30,6 +38,12 @@ public class Genie : MonoBehaviour {
 				Destroy(obj);
 			}
 		});
+
+		if ((sound_delay -= Time.deltaTime) <= 0) {
+			GM.sounds.PlaySound (Random.Range(3,5), pitch_range);
+			GM.sounds.PlaySound (Random.Range(3,5), pitch_range);
+			sound_delay = Random.Range (1.5f, 2.5f);
+		}
 		if ((taildelay -= Time.deltaTime) <= 0) {
 			taildelay = tail_delay.random;
 			GameObject tfragment = GameObject.Instantiate (tail);
@@ -54,6 +68,10 @@ public class Genie : MonoBehaviour {
 		}
 		active = set_to;
 		active_tail = set_to;
+		if (active) {
+			bubble_text = GM.shop.has_any_wares ? "Let's do business." : "Fight, peasant!";
+			GM.shop.active = true;
+		}
 	}
 	public void SetActive(bool set_to){
 		if (set_to == active) {
@@ -61,6 +79,8 @@ public class Genie : MonoBehaviour {
 		}
 		if (set_to) {
 			transform.parent.position = new Vector3 (7.33f, -21.5f, 1f);
+		} else {
+			bubble_text = "";
 		}
 		GM.routines.CStart ("genie_move", GoTo (set_to));
 		if (set_to) {
@@ -68,16 +88,57 @@ public class Genie : MonoBehaviour {
 		}
 
 	}
+
+	void OnMouseEnter(){
+		if (!GM.shop.active) {
+			bubble_text = "Did you forget something, peasant?";
+		}
+
+	}
+
+	void OnMouseExit(){
+		bubble_text = "";
+	}
+
 	void OnMouseDown(){
+		
 		if (!active) {
 			return;
 		}
+		bubble_text = "Let's do bussiness.";
 		GM.shop.active = true;
 		arrow_active = false;
+		GM.sounds.Click ();
 	}
 	public bool arrow_active {
 		set{
-			transform.Find ("arrow").sr ().enabled = value;
+			transform.Find ("arrow").sr ().enabled = false;
+		}
+	}
+	Coroutine broutine;
+	IEnumerator ClearBubble(){
+		yield return new WaitForSeconds (7f);
+		Transform b = transform.parent.Find ("bubble");
+		b.gameObject.SetActive (false);
+		TextMesh m = b.GetComponentInChildren<TextMesh> ();
+		m.text = "";
+		broutine = null;
+	}
+	public void SetBubbleText(string value, bool traced_routine = true){
+		Transform b = transform.parent.Find ("bubble");
+		b.gameObject.SetActive (value.Length > 0);
+		TextMesh m = b.GetComponentInChildren<TextMesh> ();
+		m.GetComponent<Renderer> ().sortingLayerName = "UI";
+		m.GetComponent<Renderer> ().sortingOrder = 13;
+		m.text = value;
+		if (broutine != null) {
+			StopCoroutine (broutine);
+		}
+		broutine = StartCoroutine (ClearBubble ());
+	}
+	public string bubble_text{
+		set{
+			SetBubbleText (value);
 		}
 	}
 

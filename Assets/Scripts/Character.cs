@@ -92,6 +92,7 @@ public abstract class Character : MonoBehaviour {
 			transform.position = Vector3.MoveTowards (transform.position, target.transform.position, Time.deltaTime * Setup.base_settings.GetFloat ("attack_speed"));
 			yield return null;
 		}
+		GM.sounds.PlaySound (0);
 		target.ReceiveDamage (damage);
 
 		FloorTile ft = GM.floor [x_pos, y_pos];
@@ -140,7 +141,12 @@ public abstract class Character : MonoBehaviour {
 
 	public IEnumerator MovementRoutine(FloorTile tile){
 		Vector3 target = tile.transform.position;
+		float delay_sound = .1f;
 		while(Vector2.Distance(transform.position,target) > 0f){
+			if ((delay_sound -= Time.deltaTime) <= 0f) {
+				delay_sound = .1f;
+				GM.sounds.PlaySound (1);
+			}
 			transform.position = Vector2.MoveTowards(transform.position, target , Time.deltaTime * Setup.base_settings.GetFloat("movement_speed"));
 			yield return null;
 		}
@@ -187,6 +193,7 @@ public abstract class Character : MonoBehaviour {
 	}
 
 	IEnumerator FadeDie(){
+		GM.sounds.PlaySound (2);
 		if (this is Player) {
 			GM.sword = false;
 			GM.shield = false;

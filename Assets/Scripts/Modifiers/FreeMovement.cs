@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class FreeMovement : Modifier{
 
+	public override string GetSpecDescription ()
+	{
+		return "free moves";
+	}
+
 	public override void Trigger ()
 	{
 		GM.player.free_movement_max += value;
