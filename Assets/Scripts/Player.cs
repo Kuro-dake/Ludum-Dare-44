@@ -43,12 +43,13 @@ public class Player : Character {
 		}
 	}
 
-	public override void Move (int x, int y)
+	public override action_result Move (int x, int y)
 	{
-		base.Move (x, y);
+		action_result res = base.Move (x, y);
 		if (ap <= 0 && free_movement <= 0) {
 			EndTurn ();
 		}
+		return res;
 	}
 	bool received_border_damage = false;
 	public override action_result MoveTo (int x, int y, bool instant = false)

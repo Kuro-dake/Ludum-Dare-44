@@ -73,7 +73,12 @@ public class Genie : MonoBehaviour {
 			return;
 		}
 		GM.shop.active = true;
-		Debug.Log ("clicked");
+		arrow_active = false;
+	}
+	public bool arrow_active {
+		set{
+			transform.Find ("arrow").sr ().enabled = value;
+		}
 	}
 
 }

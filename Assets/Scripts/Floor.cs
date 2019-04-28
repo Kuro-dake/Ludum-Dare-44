@@ -39,6 +39,7 @@ public class Floor : MonoBehaviour {
 				tile.sr ().color = (IsBorderTile(gp) && border_damage > 0 ? danger_color : tile_color) * Random.Range (.9f, 1.1f);
 				tile.sr ().sortingLayerName = "Ground";
 				FloorTile ft = tile.GetComponent<FloorTile> ();
+				tile.transform.localScale = Vector3.one * 1.2f;
 				ft.Init (x, y);
 				//tile.sr ().material = light_material;
 				tiles [x, y] = ft;

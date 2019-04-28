@@ -9,17 +9,18 @@ public class HPBar : MonoBehaviour {
 
 	// Use this for initialization
 	protected virtual void Start () {
-		transform.DestroyChildren ();
+		
 	}
 	public virtual void Initialize(Character to_follow){
-		
+		transform.DestroyChildren ();
 	}
 	public virtual void DisplayHP(int hp){
 		transform.DestroyChildren ();
+		float margin = Mathf.Clamp(300f/hp, 0f, 35f);
 		for (int i = 0; i < hp; i++) {
 			GameObject h = GameObject.Instantiate (heart);
 			h.transform.SetParent (transform, false);
-			h.GetComponent<RectTransform> ().anchoredPosition += Vector2.right * 35f * (i);
+			h.GetComponent<RectTransform> ().anchoredPosition += Vector2.right * margin * (i);
 		}
 	}
 }

@@ -6,12 +6,8 @@ public class Enemy : Character {
 
 	public override void Initialize ()
 	{
-		apmax = 2;
-		ap_regen = 2;
-
 		hpbar = GameObject.Instantiate (GM.characters.monster_hpbar).GetComponent<MonsterHPBar>();
 		hpbar.Initialize (this);
-		hp = 3;
 		base.Initialize ();
 	}
 
@@ -20,8 +16,8 @@ public class Enemy : Character {
 
 		if (path.Count > 0) {
 			GridPosition target = path [0];
-			Move ((target.x - gp.x).Sign(), (target.y - gp.y).Sign());
-			return true;
+			return Move ((target.x - gp.x).Sign(), (target.y - gp.y).Sign()) != action_result.none;
+
 		}
 		return false;
 

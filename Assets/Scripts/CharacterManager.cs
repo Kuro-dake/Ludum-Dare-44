@@ -55,9 +55,9 @@ public class CharacterManager : MonoBehaviour {
 		}
 	}
 
-	public void GenerateEnemy(int x, int y){
-		
-		Enemy en = GameObject.Instantiate (enemy_types[3].gameObject).GetComponent<Enemy>();
+	public void GenerateEnemy(int x, int y, int type = -1){
+		type = type == -1 ? Random.Range (0, enemy_types.Length) : type;
+		Enemy en = GameObject.Instantiate (enemy_types[type].gameObject).GetComponent<Enemy>();
 		en.MoveTo (x, y, true);
 		en.transform.localScale *= Random.Range (.9f, 1.1f);
 		en.GetComponent<Animator> ().speed = Random.Range (.9f, 1.1f);
@@ -99,11 +99,14 @@ public class CharacterManager : MonoBehaviour {
 	}
 
 	IEnumerator EnemyTurnStep(){
-		ClearDead ();
+		
 		while (GM.routines.any_routines_running) {
 			yield return null;
 		}
 		foreach(Character c in characters){
+			if (!GM.player.is_alive) {
+				yield break;
+			}
 			if(!(c is Enemy)){
 				continue;
 			}	
@@ -114,6 +117,7 @@ public class CharacterManager : MonoBehaviour {
 			while (c.ap > 0) {
 				
 				if ((c as Enemy).Movement ()) {
+					
 					while (GM.routines.any_routines_running) {
 						yield return null;
 					}
@@ -140,6 +144,7 @@ public class CharacterManager : MonoBehaviour {
 		});
 	}
 	public void EnemyTurn(){
+		ClearDead ();
 		enemies.ForEach (delegate(Enemy obj) {
 			obj.StartTurn();	
 		});

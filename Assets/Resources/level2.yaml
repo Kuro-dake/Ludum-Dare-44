@@ -2,18 +2,20 @@ x: 5
 y: 7
 cam: 11
 enemies:
- - type: smiley
+ - type: 0
    pos: 3,3
- - type: smiley
+ - type: 1
    pos: 3,5
- - type: smiley
+ - type: 1
    pos: 4,4
+ 
+ 
 
-hp: 5
-ap: 10
-free_movement: 2
-damage: 3
+hp: 4
+ap: 3
+free_movement: 0
+damage: 1
 
-items: 0,2
-prices: 2,3
-values: 2,10
+items: 7
+prices: 1
+values: 2

@@ -1,6 +1,6 @@
 grid_size: 7
-tile_width: 2.1
-tile_height: 2.2
+tile_width: 2.5
+tile_height: 2.6
 movement_speed: 12
 dying_fade_speed: 2
 shake_screen_duration: .1

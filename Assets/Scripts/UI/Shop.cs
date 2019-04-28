@@ -33,12 +33,21 @@ public class Shop : MonoBehaviour {
 	public void SetButtons(int[] btns, int[] prices, int[] values){
 		buttons.ForEach (delegate(ShopButton obj) {
 			obj.GetComponent<Button>().interactable = false;
+			obj.transform.Find("Image").gameObject.SetActive(false);
 			obj.SetPrice(0);
 		});
 		for (int i = 0; i < btns.Length; i++) {
 			buttons [btns[i]].GetComponent<Button> ().interactable = true;
 			buttons [btns [i]].SetPrice (prices [i]);
 			buttons [btns [i]].SetValue(values [i]);
+			buttons [btns [i]].transform.Find("Image").gameObject.SetActive(true);
 		}
+	}
+
+	public void UnclickButtons(){
+		buttons.ForEach (delegate(ShopButton obj) {
+			obj.mod.active = false;
+			obj.ShowToggled();
+		});
 	}
 }

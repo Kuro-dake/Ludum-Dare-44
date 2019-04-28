@@ -17,19 +17,18 @@ public class ShopButton : MonoBehaviour {
 		Transform price_bar = transform.Find ("price");
 		price_bar.DestroyChildren ();
 		price = set_price;
-		float margin = 15f;
+		float margin = Mathf.Clamp(50f / set_price, 0f, 15f);
 		float offset = (-margin * (price - 1)) /2f;
 		for (int i = 0; i < price; i++) {
 			
 			GameObject heart = Instantiate (GM.shop.price_heart);
 			heart.transform.SetParent (price_bar, true);
 			heart.GetComponent<RectTransform> ().anchoredPosition = Vector3.right * (i * margin + offset);
-			if (buy) {
-				heart.GetComponent<Image> ().color = new Color (0f, .6f, .6f, 1f);
-			}
+			heart.GetComponent<Image> ().color = buy ? new Color (0f, .3f, .6f, 1f) : Color.red;
+
 		}
 	}
-	protected Modifier mod {get{return gameObject.GetComponent<Modifier> ();}}
+	public Modifier mod {get{return gameObject.GetComponent<Modifier> ();}}
 	public virtual void Click(){
 		
 
@@ -45,7 +44,7 @@ public class ShopButton : MonoBehaviour {
 		}
 	}
 
-	void ShowToggled(){
+	public void ShowToggled(){
 
 		GetComponent<Image> ().color = mod.active ? Color.white : new Color (.6f, .6f, .6f, 1f);
 		transform.Find ("Image").GetComponent<RectTransform> ().localScale = mod.active ? Vector3.one : Vector3.one * .7f;

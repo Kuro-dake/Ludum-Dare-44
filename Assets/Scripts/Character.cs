@@ -69,10 +69,11 @@ public abstract class Character : MonoBehaviour {
 		transform.localScale = new Vector3 (Mathf.Abs (transform.localScale.x) * (left  ? 1 : -1), transform.localScale.y, 1f);
 	}
 
-	public virtual void Move(int x, int y){
-		if (MoveTo (x_pos + x, y_pos + y) == action_result.attack) {
+	public virtual action_result Move(int x, int y){
+		action_result res = MoveTo (x_pos + x, y_pos + y);
+		if (res == action_result.attack) {
 			ap -= 1;
-		} else {
+		} else if(res == action_result.movement) {
 			if (free_movement > 0) {
 				free_movement -= 1;
 			} else {
@@ -83,7 +84,7 @@ public abstract class Character : MonoBehaviour {
 		if (x != 0) {
 			Orientation (x > 0);
 		}
-
+		return res;
 	}
 
 	protected virtual IEnumerator Attack(Character target){
@@ -103,27 +104,36 @@ public abstract class Character : MonoBehaviour {
 
 	public virtual action_result MoveTo(int x, int y, bool instant = false){ // interact with
 
+		if (instant) {
+			x_pos = x;
+			y_pos = y;
+			transform.position = GM.floor [x_pos, y_pos].transform.position;
+			return action_result.movement;
+		}
+
 		x = Mathf.Clamp (x, 0, GM.floor.max_x);
 		y = Mathf.Clamp (y, 0, GM.floor.max_y);
+
+		if (x == gp.x && y == gp.y) {
+			return action_result.none;
+		}
 
 		FloorTile ft = GM.floor [x, y];
 
 		if (ft.occupant != null && ft.occupant != this && ft.occupant.player_faction != player_faction) {
-			GM.routines.CStart ("char_attack_" + GetInstanceID() ,Attack (ft.occupant));
-			return action_result.attack;
+			if (ap > 0) {
+				GM.routines.CStart ("char_attack_" + GetInstanceID (), Attack (ft.occupant));
+				return action_result.attack;
+			}
+			return action_result.none;
 		}
 
 		x_pos = x;
 		y_pos = y;
 
-		if (instant) {
-			transform.position = GM.floor [x_pos, y_pos].transform.position;
-			return action_result.movement;
-		}
-		else {
-			GM.routines.CStart ("char_move_" + this.GetInstanceID (), MovementRoutine (GM.floor [x_pos, y_pos]));
-			return action_result.movement;
-		}
+		GM.routines.CStart ("char_move_" + this.GetInstanceID (), MovementRoutine (GM.floor [x_pos, y_pos]));
+		return action_result.movement;
+
 
 
 	}
@@ -163,17 +173,24 @@ public abstract class Character : MonoBehaviour {
 		while (transform.sr ().color.a < 1f) {
 			//transform.sr().color += Color.black * Time.deltaTime * Setup.base_settings.GetFloat ("dying_fade_speed");
 			foreach (SpriteRenderer sr in transform.GetComponentsInChildren<SpriteRenderer>()) {
+				
 				sr.color += Color.black * Time.deltaTime * Setup.base_settings.GetFloat ("dying_fade_speed");
 			}
 			yield return null;
 
 		}
 		if (!(this is Player)) {
-			hpbar.gameObject.SetActive (true);
+			(hpbar as MonsterHPBar).SetEnabled(true);
+			hpbar.Initialize (this);
+			hp = hp;
 		}
 	}
 
 	IEnumerator FadeDie(){
+		if (this is Player) {
+			GM.sword = false;
+			GM.shield = false;
+		}
 		while (transform.sr ().color.a > 0f) {
 			//transform.sr().color -= Color.black * Time.deltaTime * Setup.base_settings.GetFloat ("dying_fade_speed");
 			foreach (SpriteRenderer sr in transform.GetComponentsInChildren<SpriteRenderer>()) {
@@ -206,23 +223,31 @@ public abstract class Character : MonoBehaviour {
 			so.Init (transform);
 		}
 		foreach (SpriteRenderer s in transform.GetComponentsInChildren<SpriteRenderer>()) {
+			if(new List<string>(new string[]{"Sword", "Shield", "shand"}).Contains(s.gameObject.name )){
+				continue;
+			}
 			Color c = s.color;
 			c.a = 0f;
 			s.color = c;
 		}
 		if (!(this is Player)) {
-			hpbar.gameObject.SetActive (false);
+			(hpbar as MonsterHPBar).SetEnabled(false);
+
 		}
 		FadeIn ();
 		TrackCharacter ();
 		MoveTo (x_pos, y_pos, true);
 		ap = apmax;
 		first_turn = true;
+		hp = hp;
+		free_movement = free_movement_max;
 	}
 	bool first_turn = true;
 	public virtual void StartTurn(){
+		free_movement = free_movement_max;
+
 		if (!first_turn) {
-			free_movement = free_movement_max + ap;
+			free_movement += ap;
 		}
 		first_turn = false;
 		ap = apmax;//Mathf.Clamp(Mathf.Clamp(ap, 0, apmax) + ap_regen, 0, apmax);
@@ -232,5 +257,6 @@ public abstract class Character : MonoBehaviour {
 
 public enum action_result{
 	movement,
-	attack
+	attack,
+	none
 }

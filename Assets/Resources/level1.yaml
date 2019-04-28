@@ -5,15 +5,15 @@ cam: 10
 sforce: 3
 
 enemies:
- - type: smiley
+ - type: 0
    pos: 3,3
- - type: smiley
+ - type: 0
    pos: 3,5
 
-hp: 5
-ap: 10
-free_movement: 2
-damage: 3
+hp: 4
+ap: 3
+free_movement: 0
+damage: 1
 
 #sword: 1,0
 #sword_damage: 2

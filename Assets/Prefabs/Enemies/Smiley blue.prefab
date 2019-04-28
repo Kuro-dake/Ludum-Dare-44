@@ -160,12 +160,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c519a82ad1cf0924898b6189e628db76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  free_movement_max: 0
+  free_movement_max: 1
   ap_regen: 1
   apmax: 1
   x_pos: 0
   y_pos: 0
-  _hp: 1
+  _hp: 4
   _damage: 1
   player_faction: 0
 --- !u!212 &212229633136604108
