@@ -24,6 +24,7 @@ public abstract class Character : MonoBehaviour {
 		}
 	}
 	public int apmax = 3;
+	[SerializeField]
 	protected int x_pos, y_pos;
 	bool tracking = false;
 	public int x_position{get{return x_pos;}}
@@ -47,8 +48,17 @@ public abstract class Character : MonoBehaviour {
 			hpbar.DisplayHP (_hp);
 
 		}}
-	public int damage = 1;
-
+	
+	public int _damage = 1;
+	public virtual int damage{
+		get{
+			return _damage;
+		}
+		set{
+			_damage = value;
+		}
+	}
+	[SerializeField]
 	protected bool player_faction = false;
 
 	public GridPosition gp {get {return new GridPosition (x_position, y_position);}}
@@ -142,36 +152,81 @@ public abstract class Character : MonoBehaviour {
 		}
 		GM.cam.Shake ();
 	}
+	protected void FadeIn(){
+		GM.routines.CStart ("fadein_" + GetInstanceID() ,FadeInStep ());
+	}
+	IEnumerator FadeInStep(){
+		yield return new WaitForSeconds (Random.Range (.3f, .6f));
+		Color c = transform.sr ().color;
+		c.a = 0f;
+		transform.sr ().color = c;
+		while (transform.sr ().color.a < 1f) {
+			//transform.sr().color += Color.black * Time.deltaTime * Setup.base_settings.GetFloat ("dying_fade_speed");
+			foreach (SpriteRenderer sr in transform.GetComponentsInChildren<SpriteRenderer>()) {
+				sr.color += Color.black * Time.deltaTime * Setup.base_settings.GetFloat ("dying_fade_speed");
+			}
+			yield return null;
+
+		}
+		if (!(this is Player)) {
+			hpbar.gameObject.SetActive (true);
+		}
+	}
 
 	IEnumerator FadeDie(){
 		while (transform.sr ().color.a > 0f) {
-			transform.sr().color -= Color.black * Time.deltaTime * Setup.base_settings.GetFloat ("dying_fade_speed");
+			//transform.sr().color -= Color.black * Time.deltaTime * Setup.base_settings.GetFloat ("dying_fade_speed");
 			foreach (SpriteRenderer sr in transform.GetComponentsInChildren<SpriteRenderer>()) {
 				sr.color -= Color.black * Time.deltaTime * Setup.base_settings.GetFloat ("dying_fade_speed");
 			}
 			yield return null;
 		}
-		Destroy (gameObject);
+		if (!(this is Player)) {
+			Destroy (gameObject);
+		} else {
+			gameObject.sr ().color = new Color (1f, 1f, 1f, 0f);
+		}
+
 	}
 
-	void Start(){
+	/*protected virtual void Start(){
+		
+
+	}*/
+
+	public virtual void Initialize(){
 		foreach (Transform t in transform.GetComponentsInChildren<Transform>()) {
-			SpriteOrder so = t.gameObject.AddComponent<SpriteOrder> ();
+			SpriteOrder so = null;
+			if (t.gameObject.GetComponent<SpriteOrder> () == null) {
+				so = t.gameObject.AddComponent<SpriteOrder> ();
+			}
 			if (so == null) {
 				continue;
 			}
 			so.Init (transform);
 		}
+		foreach (SpriteRenderer s in transform.GetComponentsInChildren<SpriteRenderer>()) {
+			Color c = s.color;
+			c.a = 0f;
+			s.color = c;
+		}
+		if (!(this is Player)) {
+			hpbar.gameObject.SetActive (false);
+		}
+		FadeIn ();
 		TrackCharacter ();
-	}
-
-	public virtual void Initialize(){
 		MoveTo (x_pos, y_pos, true);
+		ap = apmax;
+		first_turn = true;
 	}
-
+	bool first_turn = true;
 	public virtual void StartTurn(){
-		ap = Mathf.Clamp(Mathf.Clamp(ap, 0, apmax) + ap_regen, 0, apmax);
-		free_movement = free_movement_max;
+		if (!first_turn) {
+			free_movement = free_movement_max + ap;
+		}
+		first_turn = false;
+		ap = apmax;//Mathf.Clamp(Mathf.Clamp(ap, 0, apmax) + ap_regen, 0, apmax);
+
 	}
 }
 

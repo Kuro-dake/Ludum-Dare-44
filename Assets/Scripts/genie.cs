@@ -44,9 +44,12 @@ public class Genie : MonoBehaviour {
 	IEnumerator GoTo(bool set_to){
 		Vector3 target = new Vector3 (7.33f, set_to ? 0.38f : 25f, 1f);
 		Transform parent = transform.parent;
+		if (set_to) {
+			yield return new WaitForSeconds (.5f);
+		}
 		while (Vector3.Distance (parent.position, target) > 0f) {
 			
-			parent.position = Vector3.MoveTowards (parent.position, target, Time.deltaTime * Setup.base_settings.GetFloat ("genie_speed"));
+			parent.position = Vector3.MoveTowards (parent.position, target, Time.deltaTime * Setup.base_settings.GetFloat ("genie_speed") * (set_to ? 1 : 3));
 			yield return null;
 		}
 		active = set_to;
@@ -70,6 +73,7 @@ public class Genie : MonoBehaviour {
 			return;
 		}
 		GM.shop.active = true;
+		Debug.Log ("clicked");
 	}
 
 }

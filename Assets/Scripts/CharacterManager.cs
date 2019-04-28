@@ -24,17 +24,29 @@ public class CharacterManager : MonoBehaviour {
 			});
 		}
 	}
+
+	public List<Enemy> living_enemies{
+		get{
+			return enemies.FindAll (delegate(Enemy obj) {
+				return obj.is_alive;	
+			});
+		}
+	}
 	[SerializeField]
 	public MonsterHPBar monster_hpbar;
 	[SerializeField]
 	Enemy[] enemy_types;
 
-	public void GenerateRandomEnemies(){
+	public void DestroyEnemies(){
 		characters.ForEach (delegate(Character obj) {
 			if(obj is Enemy){
 				Destroy(obj.gameObject);
 			}	
 		});
+	}
+
+	public void GenerateRandomEnemies(){
+		
 		characters.RemoveAll(delegate(Character obj) {
 			return obj is Enemy;
 		});
@@ -45,18 +57,23 @@ public class CharacterManager : MonoBehaviour {
 
 	public void GenerateEnemy(int x, int y){
 		
-		Enemy en = GameObject.Instantiate (enemy_types[0].gameObject).GetComponent<Enemy>();
+		Enemy en = GameObject.Instantiate (enemy_types[3].gameObject).GetComponent<Enemy>();
 		en.MoveTo (x, y, true);
 		en.transform.localScale *= Random.Range (.9f, 1.1f);
 		en.GetComponent<Animator> ().speed = Random.Range (.9f, 1.1f);
 		en.TrackCharacter ();
 		en.Orientation (Random.Range (0, 2) == 1);
-		Color enemy_color = Color.white * Random.Range (.9f, 1f);
-		enemy_color.a = 1f;
+		float enemy_tint = Random.Range (.9f, 1f);
+
 		foreach (SpriteRenderer sr in en.transform.GetComponentsInChildren<SpriteRenderer>()) {
-			sr.color = enemy_color; 
+			Color c = sr.color;
+			c *= enemy_tint;
+			c.a = 1f;
+			sr.color = c;
 		}
-		en.sr ().color = Color.black;
+		if (en.sr () != null) {
+			en.sr ().color = Color.black;
+		}
 		en.Initialize ();
 
 	}
@@ -95,7 +112,7 @@ public class CharacterManager : MonoBehaviour {
 				continue;
 			}
 			while (c.ap > 0) {
-				Debug.Log (c.ap);
+				
 				if ((c as Enemy).Movement ()) {
 					while (GM.routines.any_routines_running) {
 						yield return null;
@@ -119,7 +136,7 @@ public class CharacterManager : MonoBehaviour {
 	}
 	protected void ClearDead(){
 		_characters.RemoveAll (delegate(Character obj) {
-			return obj == null || !obj.is_alive;
+			return (obj == null || !obj.is_alive) && !(obj is Player);
 		});
 	}
 	public void EnemyTurn(){

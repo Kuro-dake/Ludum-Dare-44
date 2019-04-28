@@ -340,11 +340,14 @@ public class FloatRange : Pair<float, float>{
 		return string.Format ("[FloatRange: min={0}, max={1}, steps={2}]", min, max, steps);
 	}
 }
-
+[System.Serializable]
 public class GridPosition{
 	public int x,y;
 	public GridPosition(int xpos, int ypos){
 		x = xpos;y = ypos;
+	}
+	public GridPosition(int[] pos){
+		x = pos [0];y = pos [1];
 	}
 	public override string ToString ()
 	{

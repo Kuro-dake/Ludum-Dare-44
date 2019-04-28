@@ -7,5 +7,6 @@ public class ActionPoints : Modifier {
 	public override void Trigger ()
 	{
 		GM.player.apmax += value;
+		GM.player.ap = GM.player.apmax;
 	}
 }

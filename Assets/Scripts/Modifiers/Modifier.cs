@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class Modifier : MonoBehaviour {
 	[SerializeField]
-	protected int value;
+	public int value;
 	public bool active = false;
 	public abstract void Trigger ();
 	public void Toggle(){

@@ -28,10 +28,13 @@ public class Controls : MonoBehaviour
 	bool HandleButtonDown (input_action mapped_action)
 	{
 
-		if (buttons_down.Contains (mapped_action) || GM.routines.any_routines_running || !GM.inst.player_turn) {
+		if (buttons_down.Contains (mapped_action) || GM.routines.any_routines_running || !GM.inst.player_turn || GM.shop.active) {
 			return false;
 		}
-
+		if (!GM.player.is_alive) {
+			GM.inst.RestartLevel ();
+			return true;
+		}
 		buttons_down.Add (mapped_action);
 		if (movement.Contains (mapped_action)) {
 			
