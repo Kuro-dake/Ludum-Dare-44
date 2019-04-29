@@ -36,6 +36,7 @@ public class Controls : MonoBehaviour
 			return false;
 		}
 		else if (GM.cinema.active) {
+			
 			if (!GM.cinema.Progress ()) {
 				if (GM.cinema.cinema_phase == 0) {
 					GM.inst.DevStartLevel ();

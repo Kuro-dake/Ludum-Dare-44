@@ -63,6 +63,7 @@ public class Genie : MonoBehaviour {
 			return GM.inst.cam_size_to_cinema_scale_and_genie_positions [GM.cam.ortosize][1]; // I'm going to hell for this as well
 		}
 	}
+	int last_played = 0;
 	IEnumerator GoTo(bool set_to){
 		
 		Vector3 target = new Vector3 (x_target, set_to ? -2.38f : 25f, 1f);
@@ -78,7 +79,11 @@ public class Genie : MonoBehaviour {
 		active = set_to;
 		active_tail = set_to;
 		if (active) {
-			GM.cinema.PlayString (GM.dialogues.level_intros [GM.inst.current_level - 1]);
+			if (GM.inst.current_level != last_played) {
+				
+				GM.cinema.PlayString (GM.dialogues.level_intros [GM.inst.current_level - 1]);
+				last_played = GM.inst.current_level;
+			}
 		}
 	}
 	public void SetActive(bool set_to){
