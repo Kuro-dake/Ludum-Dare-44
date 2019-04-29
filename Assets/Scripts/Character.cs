@@ -192,6 +192,10 @@ public abstract class Character : MonoBehaviour {
 		}
 	}
 
+	public void FadeDieNow(){
+		StartCoroutine (FadeDie ());
+	}
+
 	IEnumerator FadeDie(){
 		GM.sounds.PlaySound (2);
 		if (this is Player) {

@@ -41,7 +41,7 @@ public class ShopButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
 			ShowToggled ();
 
-			GM.genie.bubble_text = mod.active ? "Pleasure doing business with you, peasant." : "Okay, give it back.";
+			GM.genie.bubble_text = mod.active ? "Pleasure doing business with you, peasant." : "Okay, I'm giving it back to you.";
 
 		} else {
 			// TODO show no hp left

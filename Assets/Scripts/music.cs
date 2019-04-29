@@ -77,7 +77,7 @@ public class music : MonoBehaviour {
 			break;
 		}
 		for (int i = 0; i < tracks.Count; i++) {
-			this[i] = Mathf.MoveTowards(this[i], running > i || i == 0 ? target_volume : 0f, Time.deltaTime * fis_inv );
+			this[i] = Mathf.MoveTowards(this[i], running > i ? target_volume : 0f, Time.deltaTime * fis_inv );
 			this[i] = Mathf.Clamp (this[i], 0f, 1f);
 		}
 		tracks.ForEach(delegate(AudioSource obj) {

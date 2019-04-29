@@ -8,10 +8,8 @@ public class Controls : MonoBehaviour
 	int direction = 0;
 
 	Dictionary<string, Pair<input_action, input_action>> key_mappings = new Dictionary<string, Pair<input_action, input_action>> () {
-		/*{ "Fire3", new Pair<input_action, input_action> (input_action.none, input_action.punch) },
-		{ "Fire4", new Pair<input_action, input_action> (input_action.none, input_action.kick) },
-		{ "Fire1", new Pair<input_action, input_action> (input_action.none, input_action.block) },
-		{ "Fire2", new Pair<input_action, input_action> (input_action.none, input_action.special) },*/
+		
+		{ "Exchange AP for free movement next turn", new Pair<input_action, input_action> (input_action.none, input_action.special) },
 		{ "Horizontal", new Pair<input_action, input_action> (input_action.left, input_action.right) },
 		{ "Vertical", new Pair<input_action, input_action> (input_action.down, input_action.up) },
 	};
@@ -27,21 +25,56 @@ public class Controls : MonoBehaviour
 
 	bool HandleButtonDown (input_action mapped_action)
 	{
+		
+		if (buttons_down.Contains (mapped_action)) {
+			return false;
+		}
+		buttons_down.Add (mapped_action);
+		if (GM.title.active) {
+			GM.title.active = false;
+			GM.cinema.Initialize ();
+			return false;
+		}
+		else if (GM.cinema.active) {
+			if (!GM.cinema.Progress ()) {
+				if (GM.cinema.cinema_phase == 0) {
+					GM.inst.DevStartLevel ();
+					GM.cinema.cinema_phase = 1;
+				} else if (GM.cinema.cinema_phase == 1) {
+					if (GM.shop.has_any_wares) {
+						GM.genie.bubble_text = "Let's do business.";
+						GM.shop.active = true;
+					} else {
+						GM.genie.SetActive (false);
+					}
+				} else if (GM.cinema.cinema_phase == 4) {
+					Application.Quit ();
+					return false;
+				}
+
+			}
+			return false;
+		}
 
 		if (!GM.player.is_alive && !GM.routines.any_routines_running) {
 			GM.inst.RestartLevel ();
 			return true;
 		}
 
-		if (buttons_down.Contains (mapped_action) || GM.routines.any_routines_running || !GM.inst.player_turn || GM.shop.active) {
+		if (GM.routines.any_routines_running || !GM.inst.player_turn || GM.shop.active) {
 			return false;
 		}
 
-		buttons_down.Add (mapped_action);
+
 		if (movement.Contains (mapped_action)) {
 			
 			GM.player.Move (movement_values [mapped_action] [0], movement_values [mapped_action] [1]);
 			GM.genie.SetActive (false);
+			return false;
+		}
+
+		if (mapped_action == input_action.special) {
+			GM.player.EndTurn ();
 		}
 
 		return false;
@@ -87,9 +120,12 @@ public class Controls : MonoBehaviour
 
 			input_action passed_action = val > 0 ? kv.Value.second : kv.Value.first;
 			//			Debug.Log (passed_action);
-			if (HandleButtonDown (passed_action)) {
-				//break;
-			}
+
+
+				if (HandleButtonDown (passed_action)) {
+					//break;
+				}
+
 		}
 
 		HandlePressedButtons ();
@@ -102,9 +138,6 @@ public class Controls : MonoBehaviour
 public enum input_action
 {
 	none,
-	punch,
-	kick,
-	block,
 	special,
 	down,
 	up,

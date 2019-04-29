@@ -20,6 +20,9 @@ public class Genie : MonoBehaviour {
 	float sound_delay = 0f;
 	FloatRange pitch_range;
 	void Update () {
+		if (GM.cinema.active || GM.title.active) {
+			return;
+		}
 		if (!active_tail) {
 			GM.music.running = GM.player.is_alive ? 3 : 2;
 			bubble_text = "";
@@ -55,8 +58,14 @@ public class Genie : MonoBehaviour {
 			tail_fragments.Add (tfragment);
 		}
 	}
+	float x_target{
+		get{
+			return GM.inst.cam_size_to_cinema_scale_and_genie_positions [GM.cam.ortosize][1]; // I'm going to hell for this as well
+		}
+	}
 	IEnumerator GoTo(bool set_to){
-		Vector3 target = new Vector3 (7.33f, set_to ? 0.38f : 25f, 1f);
+		
+		Vector3 target = new Vector3 (x_target, set_to ? -2.38f : 25f, 1f);
 		Transform parent = transform.parent;
 		if (set_to) {
 			yield return new WaitForSeconds (.5f);
@@ -69,8 +78,7 @@ public class Genie : MonoBehaviour {
 		active = set_to;
 		active_tail = set_to;
 		if (active) {
-			bubble_text = GM.shop.has_any_wares ? "Let's do business." : "Fight, peasant!";
-			GM.shop.active = true;
+			GM.cinema.PlayString (GM.dialogues.level_intros [GM.inst.current_level - 1]);
 		}
 	}
 	public void SetActive(bool set_to){
@@ -78,7 +86,7 @@ public class Genie : MonoBehaviour {
 			return;
 		}
 		if (set_to) {
-			transform.parent.position = new Vector3 (7.33f, -21.5f, 1f);
+			transform.parent.position = new Vector3 (x_target, -21.5f, 1f);
 		} else {
 			bubble_text = "";
 		}
@@ -90,9 +98,17 @@ public class Genie : MonoBehaviour {
 	}
 
 	void OnMouseEnter(){
+		if (GM.cinema.active) {
+			return;
+		}
+		if (!GM.shop.has_any_wares) {
+			bubble_text = "Start moving peasant!";
+			return;
+		}
 		if (!GM.shop.active) {
 			bubble_text = "Did you forget something, peasant?";
 		}
+
 
 	}
 
@@ -101,8 +117,14 @@ public class Genie : MonoBehaviour {
 	}
 
 	void OnMouseDown(){
-		
+		if (GM.cinema.active) {
+			return;
+		}
 		if (!active) {
+			return;
+		}
+		if (!GM.shop.has_any_wares) {
+			bubble_text = "Quit your bullsh** and fight!";
 			return;
 		}
 		bubble_text = "Let's do bussiness.";

@@ -56,3 +56,6 @@ TagManager:
   - name: UI
     uniqueID: 3451076701
     locked: 0
+  - name: Cinema
+    uniqueID: 762327569
+    locked: 0

@@ -18,10 +18,6 @@ public class Shop : MonoBehaviour {
 		}
 	}
 
-	void Start(){
-		//active = false;
-	}
-
 	public void SetPrice(){
 		buttons [0].SetPrice (4);
 	}

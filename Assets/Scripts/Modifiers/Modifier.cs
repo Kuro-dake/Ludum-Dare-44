@@ -14,7 +14,7 @@ public abstract class Modifier : MonoBehaviour {
 		if (buy) {
 			btext += "increase your " + GetSpecDescription () + "\nby " + abs_value + " point" + (abs_value == 1 ? "" : "s") + " for " + price + " vitality.";
 		} else {
-			btext += "give you " + price + " vitality for taking " + price +  " \npoint" + (price == 1 ? "" : "s") + " from your " +  GetSpecDescription();
+			btext += "give you " + price + " vitality for taking " + abs_value +  " \npoint" + (abs_value == 1 ? "" : "s") + " from your " +  GetSpecDescription();
 		}
 		return btext + ".";
 	}

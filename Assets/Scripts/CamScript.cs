@@ -23,4 +23,10 @@ public class CamScript : MonoBehaviour {
 		}
 		transform.position = orig_pos;
 	}
+
+	public int ortosize{
+		get{
+			return Mathf.RoundToInt (GetComponent<Camera> ().orthographicSize);
+		}
+	}
 }
